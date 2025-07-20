@@ -1,5 +1,51 @@
 // Animated Team Color Palette logic
 document.addEventListener('DOMContentLoaded', function() {
+    // Dynamically render dashboard team list from teamData
+    function renderDashboardTeams() {
+        const dashboardGrid = document.querySelector('.dashboard-grid');
+        if (!dashboardGrid) return;
+        dashboardGrid.innerHTML = '';
+
+        // Group teams by conference/division
+        const conferences = {};
+        Object.entries(teamData).forEach(([teamId, team]) => {
+            if (!conferences[team.conference]) conferences[team.conference] = {};
+            if (!conferences[team.conference][team.division]) conferences[team.conference][team.division] = [];
+            conferences[team.conference][team.division].push({ teamId, ...team });
+        });
+
+        Object.entries(conferences).forEach(([confName, divisions]) => {
+            const confDiv = document.createElement('div');
+            confDiv.className = 'conference';
+            confDiv.innerHTML = `<div class="conference-header">${confName.toUpperCase()}</div>`;
+            Object.entries(divisions).forEach(([divName, teams]) => {
+                const divDiv = document.createElement('div');
+                divDiv.className = 'division';
+                divDiv.innerHTML = `<div class="division-header">${divName}</div>`;
+                const teamsList = document.createElement('div');
+                teamsList.className = 'teams-list';
+                teams.forEach(team => {
+                    const teamItem = document.createElement('a');
+                    teamItem.href = '#';
+                    teamItem.className = 'team-item';
+                    teamItem.setAttribute('onclick', `showTeamDetail('${team.teamId}')`);
+                    teamItem.innerHTML = `
+                        <div class="team-logo">
+                            <img src="${team.logo}" alt="${team.name} Logo">
+                        </div>
+                        <div class="team-name">${team.name}</div>
+                    `;
+                    teamsList.appendChild(teamItem);
+                });
+                divDiv.appendChild(teamsList);
+                confDiv.appendChild(divDiv);
+            });
+            dashboardGrid.appendChild(confDiv);
+        });
+    }
+
+    // Call on load
+    renderDashboardTeams();
     const colorHexMap = {
         'navy blue': '#1e3a7a',
         'light blue': '#87ceeb',
@@ -53,12 +99,34 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Debug logo counter logic
+    function renderLogoCounter() {
+        const totalTeams = Object.keys(teamData).length;
+        let logoCount = 0;
+        let secondaryLogoCount = 0;
+        Object.values(teamData).forEach(team => {
+            if (team.logo && team.logo.startsWith('http')) logoCount++;
+            if (team.secondaryLogo && team.secondaryLogo.startsWith('http')) secondaryLogoCount++;
+        });
+        let counterDiv = document.getElementById('logo-counter');
+        if (!counterDiv) {
+            counterDiv = document.createElement('div');
+            counterDiv.id = 'logo-counter';
+            counterDiv.style.margin = '1rem 0 0.5rem 0';
+            counterDiv.style.fontSize = '1rem';
+            counterDiv.style.color = '#444';
+            const paletteSection = document.getElementById('color-palette-section');
+            if (paletteSection) paletteSection.parentNode.insertBefore(counterDiv, paletteSection.nextSibling);
+        }
+        counterDiv.textContent = `Logos: ${logoCount}/${totalTeams} | Secondary Logos: ${secondaryLogoCount}/${totalTeams}`;
+        counterDiv.style.display = debugMode ? 'block' : 'none';
+    }
+
     function renderTeamColorPaletteList() {
         const paletteList = document.getElementById('color-palette-list');
         if (!paletteList) return;
         paletteList.innerHTML = '';
 
-        // ...existing code for palette rendering...
         // Build a map of hex -> displayName (first encountered name or custom name)
         const hexToCustomName = {
             '#AD2224': 'firebrick',
@@ -169,6 +237,9 @@ document.addEventListener('DOMContentLoaded', function() {
             colorRow.appendChild(info);
             paletteList.appendChild(colorRow);
         });
+
+        // After rendering palette, update logo counter
+        renderLogoCounter();
     }
 
     // Hide palette by default
@@ -177,6 +248,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (paletteSection) {
             paletteSection.style.display = visible ? 'block' : 'none';
         }
+        // Show/hide logo counter in sync with debug mode
+        const counterDiv = document.getElementById('logo-counter');
+        if (counterDiv) counterDiv.style.display = visible ? 'block' : 'none';
     }
     setPaletteVisibility(false); // Hide on load
 
@@ -192,6 +266,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 setDebugIndicator(debugMode);
                 if (debugMode) {
                     renderTeamColorPaletteList();
+                } else {
+                    // Hide logo counter if debug mode is off
+                    const counterDiv = document.getElementById('logo-counter');
+                    if (counterDiv) counterDiv.style.display = 'none';
                 }
                 dKeyCount = 0;
             }
@@ -234,6 +312,7 @@ const teamData = {
             'cantu-kings': {
                 name: 'Cantù Kings',
                 logo: 'https://i.postimg.cc/zX9XJ6sc/Chat-GPT-Image-15-lug-2025-10-14-57.png',
+                secondaryLogo: 'https://i.postimg.cc/7hLcm98J/cant-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northwest Division',
                 population: '0.2M',
@@ -244,7 +323,7 @@ const teamData = {
             'trento-bears': {
                 name: 'Trento Bears',
                 logo: 'https://i.postimg.cc/W41xHqDb/2548a518-462c-42a1-957d-6193febfca66-1.png',
-                secondaryLogo: 'https://i.postimg.cc/c4tYx8YS/Chat-GPT-Image-18-lug-2025-14-12-36.png',
+                secondaryLogo: 'https://i.postimg.cc/QN6vV21Q/trento-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northwest Division',
                 population: '0.3M',
@@ -273,9 +352,10 @@ const teamData = {
                 story: "Inspired by the serpent (biscione)—the iconic emblem of Milanese heraldry and Inter's football crest—the Vipers represent agility and striking precision, rooted in centuries-old local symbolism."
             },
             'brescia-warriors': {
+                secondaryLogo: 'https://i.postimg.cc/7hLcm98J/cant-secondary.png',
                 name: 'Brescia Warriors',
                 logo: 'https://i.postimg.cc/VsF4jcf3/Chat-GPT-Image-15-lug-2025-09-59-28-1.png',
-                secondaryLogo: 'https://i.postimg.cc/x1rmcTyb/Chat-GPT-Image-18-lug-2025-14-12-37.png',
+                secondaryLogo: 'https://i.postimg.cc/cL3z96jh/brescia-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Lombard Division',
                 population: '0.6M',
@@ -286,16 +366,18 @@ const teamData = {
             'cremona-rhinos': {
                 name: 'Cremona Rhinos',
                 logo: 'https://i.postimg.cc/2SD6nLN0/20250711-2239-Cremona-Rhinos-Logo-remix-01jzxkbdf9eghrfejmasf42n7v.png',
+                secondaryLogo: 'https://i.postimg.cc/PqGgT1Z0/cremona-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Lombard Division',
                 population: '0.3M',
                 stadium: '8,000',
-                colors: ['dark blue', '#ffa500', 'white'], // orange as Cantù
+                colors: ['navy blue', 'orange', 'white'], // navy blue, orange, white
                 story: "Cremona stands for power and craftsmanship, from its medieval strongholds to its renowned luthiers. The rhinoceros, an image of unstoppable strength, mirrors the city's enduring character in Lombardy's heartland."
             },
             'varese-falcons': {
                 name: 'Varese Falcons',
                 logo: 'https://i.postimg.cc/pV3x5CmQ/Chat-GPT-Image-4-lug-2025-21-32-02-1.png',
+                secondaryLogo: 'https://i.ibb.co/VpJNw8QZ/varese-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Lombard Division',
                 population: '0.6M',
@@ -316,7 +398,7 @@ const teamData = {
             'verona-scorpions': {
                 name: 'Verona Scorpions',
                 logo: 'https://i.postimg.cc/k5YL3M8N/5d96de2a-ebba-4dfa-b5df-4914f85872bb-1.png',
-                secondaryLogo: 'https://i.postimg.cc/L8z1fKNQ/Chat-GPT-Image-18-lug-2025-14-12-35.png',
+                secondaryLogo: 'https://i.postimg.cc/vTSKjnbq/verona-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northeast Division',
                 population: '1.3M',
@@ -327,6 +409,7 @@ const teamData = {
             'treviso-serpents': {
                 name: 'Treviso Serpents',
                 logo: 'https://i.postimg.cc/nhk62GhP/20250704-2110-Treviso-Serpents-Logo-remix-01jzbdfxb3ebyvajferzxv79nj-1.png',
+                secondaryLogo: 'https://i.postimg.cc/ZR4XyZwc/treviso-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northeast Division',
                 population: '1M',
@@ -337,7 +420,7 @@ const teamData = {
             'padua-archers': {
                 name: 'Padua Archers',
                 logo: 'https://i.postimg.cc/9XszFN85/Chat-GPT-Image-11-lug-2025-22-39-34.png',
-                secondaryLogo: 'https://i.postimg.cc/PJ9wbdg9/Chat-GPT-Image-18-lug-2025-14-12-38.png',
+                secondaryLogo: 'https://i.postimg.cc/Yq0K3rMD/padua-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northeast Division',
                 population: '1.2M',
@@ -348,6 +431,7 @@ const teamData = {
             'trieste-tritons': {
                 name: 'Trieste Tritons',
                 logo: 'https://i.postimg.cc/Hk43YDJY/20250704-2116-Trieste-Tritons-Logo-remix-01jzbdt7xxfe3re43p5gxq68x6-1.png',
+                secondaryLogo: 'https://i.ibb.co/GfDzN9Nq/trieste-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northeast Division',
                 population: '0.5M',
@@ -358,6 +442,7 @@ const teamData = {
             'florence-lilies': {
                 name: 'Florence Lilies',
                 logo: 'https://i.postimg.cc/9XwH29LD/assets-task-01jzbeavdnejhb4befpdg7y6nz-1751657132-img-1.png',
+                secondaryLogo: 'https://i.postimg.cc/k4szQZZd/florence-secondary.png',
                 conference: 'Mediterranean Conference',
                 division: 'Apennine Division',
                 population: '1.3M',
@@ -408,6 +493,7 @@ const teamData = {
             'roma-virtus': {
                 name: 'Roma Virtus',
                 logo: 'https://i.postimg.cc/25732hN9/Virtus-Roma-1960-logo.png',
+                secondaryLogo: 'https://i.postimg.cc/RVNytgLj/roma-secondary.png',
                 conference: 'Mediterranean Conference',
                 division: 'Roman Division',
                 population: '4.3M',
@@ -469,6 +555,7 @@ const teamData = {
             'avellino-jackals': {
                 name: 'Avellino Jackals',
                 logo: 'https://i.postimg.cc/kGG836gQ/Chat-GPT-Image-11-lug-2025-22-47-10.png',
+                secondaryLogo: 'https://i.postimg.cc/j5tjJSdM/avellino-sec.png',
                 conference: 'Mediterranean Conference',
                 division: 'South Division',
                 population: '0.3M',
@@ -478,7 +565,8 @@ const teamData = {
             },
             'palermo-panthers': {
                 name: 'Palermo Panthers',
-                logo: 'https://i.postimg.cc/5yC5GQ0X/assets-task-01jzxdwd4mfsz8re7d77yv88fz-1752260626-img-1.webp',
+                logo: 'https://i.postimg.cc/BvRHhc87/Palermo-3.png',
+                secondaryLogo: 'https://i.postimg.cc/8PY8X2Cp/palermo-secondary.png',
                 conference: 'Mediterranean Conference',
                 division: 'South Division',
                 population: '1.2M',
@@ -488,7 +576,8 @@ const teamData = {
             },
             'catania-elephants': {
                 name: 'Catania Elephants',
-                logo: 'https://i.postimg.cc/RCLZ1VGd/20250711-2108-Catania-Elephants-Logo-remix-01jzxe44k2fey8y42zy534fdjf.png',
+                logo: 'https://i.postimg.cc/pdmKY1dn/Catania-3.png',
+                secondaryLogo: 'https://i.postimg.cc/bwS77mGQ/catania-secondary.png',
                 conference: 'Mediterranean Conference',
                 division: 'South Division',
                 population: '0.9M',
