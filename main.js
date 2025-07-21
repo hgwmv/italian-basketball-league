@@ -293,6 +293,7 @@ const teamData = {
             'casale-hawks': {
                 name: 'Casale Hawks',
                 logo: 'https://i.postimg.cc/66v1FyFV/Chat-GPT-Image-11-lug-2025-22-32-19.png',
+                secondaryLogo: 'https://i.postimg.cc/Z5QC9xHJ/casale-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northwest Division',
                 population: '0.1M',
@@ -390,6 +391,7 @@ const teamData = {
             'venice-lions': {
                 name: 'Venice Lions',
                 logo: 'https://i.postimg.cc/QNz0dJ0z/Chat-GPT-Image-15-lug-2025-10-26-57.png',
+                secondaryLogo: 'https://i.postimg.cc/Vvz6yGfW/venice-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northeast Division',
                 population: '0.9M',
@@ -464,7 +466,8 @@ const teamData = {
             },
             'fortitudo-bologna': {
                 name: 'Fortitudo Bologna',
-                logo: 'https://i.postimg.cc/1tsV70Bg/Stemma-Fortitudo-Bologna.png',
+                logo: 'https://i.postimg.cc/Dz39BTJM/Bologna-Fortitudo-2.png',
+                secondaryLogo: 'https://i.postimg.cc/13FxGttF/Bologna-Fortitudo.png',
                 conference: 'Mediterranean Conference',
                 division: 'Apennine Division',
                 population: '1.3M',
@@ -475,6 +478,7 @@ const teamData = {
             'forli-wolves': {
                 name: 'Forlì Wolves',
                 logo: 'https://i.postimg.cc/pXm3Ws9j/Chat-GPT-Image-11-lug-2025-22-26-48.png',
+                secondaryLogo: 'https://i.postimg.cc/ZnK23pYL/forl-secondary.png',
                 conference: 'Mediterranean Conference',
                 division: 'Apennine Division',
                 population: '0.3M',
@@ -547,6 +551,7 @@ const teamData = {
             'bari-roosters': {
                 name: 'Bari Roosters',
                 logo: 'https://i.postimg.cc/Y0sVNWPj/20250711-2227-Bari-Roosters-Basketball-Logo-remix-01jzxjp77je6x822y50s88zp6v.png',
+                secondaryLogo: 'https://i.postimg.cc/XJfJzSbv/bari-secondary.png',
                 conference: 'Mediterranean Conference',
                 division: 'South Division',
                 population: '1.2M',
@@ -590,6 +595,7 @@ const teamData = {
             'napoli-heatwaves': {
                 name: 'Napoli Heatwaves',
                 logo: 'https://i.postimg.cc/pVGgMwdx/Chat-GPT-Image-11-lug-2025-22-26-56.png',
+                secondaryLogo: 'https://i.postimg.cc/nzbr2VN5/napoli-secondary.png',
                 conference: 'Mediterranean Conference',
                 division: 'South Division',
                 population: '3.0M',
@@ -799,6 +805,10 @@ function initParallax() {
                 dashboardView.style.display = 'none';
                 dashboardView.classList.remove('fade-out');
                 
+                // Hide download section on team detail view
+                const downloadSection = document.getElementById('download-section');
+                if (downloadSection) downloadSection.style.display = 'none';
+                
                 const teamDetail = document.getElementById('team-detail');
                 teamDetail.classList.add('active', 'slide-in');
                 
@@ -835,6 +845,10 @@ function initParallax() {
                 teamDetail.classList.remove('active');
                 teamDetail.style.animation = '';
                 dashboardView.style.display = 'block';
+                
+                // Show download section on dashboard view
+                const downloadSection = document.getElementById('download-section');
+                if (downloadSection) downloadSection.style.display = 'block';
                 
                 // Trigger slide in animation for dashboard
                 setTimeout(() => {
