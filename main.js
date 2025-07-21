@@ -282,6 +282,7 @@ const teamData = {
             'genoa-mariners': {
                 name: 'Genoa Mariners',
                 logo: 'https://i.postimg.cc/sDZKQGLg/Chat-GPT-Image-15-lug-2025-10-21-30.png',
+                secondaryLogo: 'https://i.postimg.cc/0yKjT4B0/genoa-sec.png',
                 conference: 'Alpine Conference',
                 division: 'Northwest Division',
                 population: '1.2M',
@@ -302,6 +303,7 @@ const teamData = {
             'turin-bulls': {
                 name: 'Turin Bulls',
                 logo: 'https://i.postimg.cc/76pchBKf/Chat-GPT-Image-4-lug-2025-21-34-02-1.png',
+                secondaryLogo: 'https://i.postimg.cc/6ptLc1xH/turin-secondary.png',
                 conference: 'Alpine Conference',
                 division: 'Northwest Division',
                 population: '2M',
